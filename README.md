@@ -468,7 +468,7 @@ sudo certbot --nginx -d tu-dominio.com
 
 ## 🔮 Mejoras Futuras
 
-### 📌 Roadmap 2025
+### 📌 Roadmap 2026
 
 - **🌐 Comunidad colaborativa**: Sistema de múltiples bases de datos compartidas entre usuarios
 - **🕷️ Multi-scraper**: Soporte para múltiples sitios de novelas (TuNovela.com, NovelasFull.com, etc.)
