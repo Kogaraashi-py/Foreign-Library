@@ -1,0 +1,18 @@
+{
+  "include": ["."],
+  "pythonVersion": "3.13",
+  "reportMissingImports": false,
+  "executionEnvironments": [
+    {
+      "root": ".",
+      "extraPaths": [
+        "./",
+        "./models",
+        "./schemas",
+        "./api",
+        "./services",
+        "./core"
+      ]
+    }
+  ]
+}
