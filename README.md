@@ -10,7 +10,7 @@ Sistema completo de gestión de novelas ligeras con scraping automático desde N
 
 ## 🎯 Características
 
-- ✅ **Backend FastAPI** - API REST completa con autenticación JWT
+- ✅ **Backend FastAPI** - API REST completa
 - ✅ **Frontend React** - Interfaz moderna y responsiva
 - ✅ **Base de datos MySQL** - Datos persistentes con SQLModel
 - ✅ **Scraper integrado** - Descarga automática de novelas desde NovelasLigera.com
@@ -431,11 +431,6 @@ sudo certbot --nginx -d tu-dominio.com
 ---
 
 ## 🛡️ API Endpoints Principales
-
-### Autenticación
-
-- `POST /api/auth/register` - Registrar usuario
-- `POST /api/auth/login` - Login (retorna JWT)
 
 ### Novelas
 
