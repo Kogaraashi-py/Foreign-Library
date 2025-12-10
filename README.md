@@ -2,12 +2,11 @@
 
 Sistema completo de gestión de novelas ligeras con scraping automático desde NovelasLigera.com, interfaz moderna y API REST robusta.
 
-## Responsivo y Hermoso
+## Interfaz responsiva e Intuitiva
 
 <p align="center">
   <img src="./assets/vista.png" alt="Login" width="600">
 </p>
----
 
 ## 🎯 Características
 
