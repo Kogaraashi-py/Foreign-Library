@@ -73,71 +73,28 @@ docker-compose logs -f
 
 ```
 novels-portable/
-├── docker-compose.yml          # Orquestador de contenedores
-├── init.sql                    # Inicialización de la base de datos
-├── README.md                   # Este archivo
-│
-├── backend/                    # API FastAPI
+├── docker-compose.yml       # Orquestador de contenedores
+├── init.sql                # Base de datos inicial
+├── README.md               # Este archivo
+├── backend/                # API FastAPI
 │   ├── Dockerfile
-│   ├── main.py                # Punto de entrada
+│   ├── main.py
 │   ├── requirements.txt
-│   ├── pyrightconfig.json
-│   │
-│   ├── api/                   # Endpoints de la API
-│   │   ├── admin.py          # Rutas de administración
-│   │   ├── auth.py           # Autenticación y registro
-│   │   ├── chapters.py       # Gestión de capítulos
-│   │   ├── deps.py           # Dependencias compartidas
-│   │   ├── genres.py         # Gestión de géneros
-│   │   ├── novels.py         # CRUD de novelas
-│   │   └── scraping.py       # API de scraping
-│   │
-│   ├── core/                  # Configuración central
-│   │   ├── config.py         # Variables de entorno
-│   │   ├── data_base.py      # Conexión a BD
-│   │   └── security.py       # JWT y passwords
-│   │
-│   ├── models/                # Modelos SQLModel
-│   │   ├── chapter.py        # Modelo de capítulos
-│   │   ├── genre.py          # Modelo de géneros
-│   │   ├── novel.py          # Modelo de novelas
-│   │   ├── novel_genre.py    # Relación muchos a muchos
-│   │   └── user.py           # Modelo de usuarios
-│   │
-│   ├── schemas/               # Schemas Pydantic
-│   │   ├── chapter.py        # DTOs de capítulos
-│   │   ├── genre.py          # DTOs de géneros
-│   │   ├── novel.py          # DTOs de novelas
-│   │   ├── scraping.py       # DTOs de scraping
-│   │   ├── token.py          # DTOs de autenticación
-│   │   └── user.py           # DTOs de usuarios
-│   │
-│   ├── services/              # Lógica de negocio
-│   │   ├── auth_services.py
-│   │   ├── chapter_services.py
-│   │   ├── novel_service.py
-│   │   └── scraping_services.py
-│   │
-│   ├── scrapers/              # Sistema de scraping
-│   │   ├── definitivo.py     # Scraper principal
-│   │   ├── test_metadata.py  # Verificar disponibilidad
-│   │   ├── verify_json.py    # Validar JSON descargado
-│   │   ├── enviar-a-la-api.py # Subir a la API
-│   │   ├── send-to-api.py
-│   │   ├── sentoapiv2.py
-│   │   └── mis_novelas/      # JSONs descargados
-│   │
-│   ├── static/                # Archivos estáticos
-│   │   └── novels/           # Portadas de novelas
-│   │       ├── *.jpg
-│   │       └── *.webp
-│   │
-│   └── utils/                 # Utilidades
-│
-└── frontend/                  # React App
+│   ├── api/               # Endpoints REST
+│   ├── models/            # Modelos de base de datos
+│   ├── schemas/           # Validación de datos
+│   ├── services/          # Lógica de negocio
+│   ├── scrapers/          # 🕷️ Sistema de scraping
+│   │   ├── definitivo.py
+│   │   ├── test_metadata.py
+│   │   ├── verify_json.py
+│   │   ├── enviar-a-la-api.py
+│   │   └── mis_novelas/   # JSONs descargados
+│   └── static/
+│       └── novels/        # Portadas de novelas
+└── frontend/              # React App
     ├── Dockerfile
     ├── nginx.conf
-    ├── package.json
     └── src/
 ```
 
@@ -146,6 +103,18 @@ novels-portable/
 ## 🕷️ Sistema de Scraping
 
 El sistema incluye un scraper completo para descargar novelas desde **NovelasLigera.com**.
+
+### Acceder al Contenedor
+
+**IMPORTANTE:** Todos los comandos del scraper deben ejecutarse dentro del contenedor de Docker:
+
+```bash
+# Entrar al contenedor backend
+docker-compose exec backend bash
+
+# Navegar a la carpeta de scrapers
+cd scrapers
+```
 
 ### Flujo de Trabajo
 
@@ -156,7 +125,6 @@ El sistema incluye un scraper completo para descargar novelas desde **NovelasLig
 #### 1️⃣ Verificar que la novela existe
 
 ```bash
-cd backend/scrapers
 python test_metadata.py el-tutorial-es-demasiado-dificil
 ```
 
@@ -206,23 +174,29 @@ python enviar-a-la-api.py mis_novelas/eastern-palace.json
 
 **Resultado:** La novela se sube automáticamente a la base de datos con todos sus capítulos.
 
-### Ejemplos Prácticos
+### Ejemplo Completo
 
 ```bash
-# Workflow completo para una novela nueva
-cd backend/scrapers
+# 1. Entrar al contenedor
+docker-compose exec backend bash
 
-# 1. Verificar
+# 2. Ir a scrapers
+cd scrapers
+
+# 3. Verificar disponibilidad
 python test_metadata.py trash-of-the-counts-family
 
-# 2. Descargar (primeros 100 capítulos)
+# 4. Descargar (primeros 100 capítulos)
 python definitivo.py trash-of-the-counts-family --start 1 --end 100
 
-# 3. Validar
+# 5. Validar JSON
 python verify_json.py mis_novelas/trash-of-the-counts-family.json
 
-# 4. Subir a la API
+# 6. Subir a la API
 python enviar-a-la-api.py mis_novelas/trash-of-the-counts-family.json
+
+# 7. Salir del contenedor
+exit
 ```
 
 ### Novelas de Ejemplo Incluidas
@@ -234,8 +208,6 @@ El proyecto incluye varias novelas pre-descargadas en `backend/scrapers/mis_nove
 - `eastern-palace.json`
 - `el-esclavo-de-la-sombra.json`
 - `el-principe-demonio-va-a-la-academia.json`
-- `el-verdadero-mundo-marcial.json`
-- `el-villano-que-quiere-vivir.json`
 - `trash-of-the-counts-family.json`
 
 ---
@@ -267,10 +239,12 @@ docker-compose down -v
 docker-compose build
 docker-compose up -d
 
-# Ejecutar comando en un contenedor
-docker-compose exec backend python -m pip list
+# Ejecutar comando en el contenedor backend
 docker-compose exec backend bash
-docker-compose exec db mysql -u root -p
+docker-compose exec backend python -m pip list
+
+# Acceder a MySQL
+docker-compose exec db mysql -u novels_user -p
 ```
 
 ---
@@ -342,7 +316,7 @@ docker cp novels-backend:/tmp/static-backup.tar.gz ./static-backup.tar.gz
 
 ```bash
 # Restaurar base de datos
-docker-compose exec -T db mysql -u root -prootpassword novels_db < backup-20240115.sql
+docker-compose exec -T db mysql -u root -prootpassword novels_db < backup-20250115.sql
 
 # Restaurar imágenes
 docker cp static-backup.tar.gz novels-backend:/tmp/
@@ -397,28 +371,18 @@ Ctrl + Shift + R (Chrome/Firefox)
 ### Error: Scraper no descarga
 
 ```bash
-# Verificar conexión a NovelasLigera.com
+# Entrar al contenedor
+docker-compose exec backend bash
+
+# Verificar conectividad
 curl -I https://novelasligera.com/
 
-# Verificar permisos de escritura
-ls -la backend/scrapers/mis_novelas/
+# Verificar permisos
+ls -la scrapers/mis_novelas/
 
-# Ver logs detallados del scraper
-python definitivo.py nombre-novela --verbose
-```
-
----
-
-## 📈 Monitoreo
-
-### Ver uso de recursos
-
-```bash
-# CPU y memoria
-docker stats
-
-# Espacio en disco de volúmenes
-docker system df -v
+# Ver logs del contenedor
+exit
+docker-compose logs backend
 ```
 
 ---
@@ -466,7 +430,7 @@ sudo certbot --nginx -d tu-dominio.com
 
 ---
 
-## 🛡️ API Endpoints
+## 🛡️ API Endpoints Principales
 
 ### Autenticación
 
@@ -485,7 +449,6 @@ sudo certbot --nginx -d tu-dominio.com
 
 - `GET /api/chapters/novel/{novel_id}` - Capítulos de una novela
 - `GET /api/chapters/{id}` - Obtener capítulo específico
-- `POST /api/chapters` - Crear capítulo
 
 ### Géneros
 
@@ -502,21 +465,30 @@ sudo certbot --nginx -d tu-dominio.com
 
 ## 🛠️ Tecnologías Utilizadas
 
-### Backend
+**Backend:** FastAPI, SQLModel, MySQL, Pydantic, JWT, BeautifulSoup4  
+**Frontend:** React, Nginx  
+**DevOps:** Docker, Docker Compose
 
-- **FastAPI** - Framework web moderno
-- **SQLModel** - ORM con tipado
-- **MySQL** - Base de datos relacional
-- **Pydantic** - Validación de datos
-- **JWT** - Autenticación segura
-- **BeautifulSoup4** - Web scraping
-- **httpx** - Cliente HTTP asíncrono
+---
 
-### Frontend
+## 🔮 Mejoras Futuras
 
-- **React** - Biblioteca UI
-- **Nginx** - Servidor web
-- **Docker** - Contenedores
+### 📌 Roadmap 2025
+
+- **🌐 Comunidad colaborativa**: Sistema de múltiples bases de datos compartidas entre usuarios
+- **🕷️ Multi-scraper**: Soporte para múltiples sitios de novelas (TuNovela.com, NovelasFull.com, etc.)
+- **☁️ Modo portátil web**:
+  - Aplicación web accesible desde cualquier lugar
+  - Los usuarios pueden subir su propia base de datos
+  - Sincronización automática entre dispositivos
+  - Lectura offline con PWA
+- **📚 Librería personal en la nube**: Cada usuario con su colección privada accesible desde cualquier dispositivo
+- **🤝 Compartir colecciones**: Exportar/importar bases de datos entre usuarios
+- **🔍 Búsqueda avanzada**: Por autor, año, géneros combinados, estado de traducción
+- **📊 Estadísticas de lectura**: Progreso, capítulos leídos, tiempo estimado
+- **🎨 Temas personalizables**: Modo nocturno, fuentes ajustables, colores personalizados
+- **🔔 Notificaciones**: Nuevos capítulos, actualizaciones de series seguidas
+- **⭐ Sistema de favoritos y listas**: Crear listas personalizadas (Leyendo, Completado, Pendiente)
 
 ---
 
@@ -524,7 +496,6 @@ sudo certbot --nginx -d tu-dominio.com
 
 - **Issues:** Reportar en el repositorio
 - **Documentación API:** http://localhost:8000/docs
-- **Email:** soporte@ejemplo.com
 
 ---
 
@@ -544,5 +515,6 @@ MIT License - Ver archivo LICENSE
 ---
 
 **Versión:** 1.0.0  
-**Última actualización:** Diciembre 2025  
-**Autor:** Hernando Guzmán
+**Última actualización:** Enero 2025  
+**Autor:** Hernando Guzmán  
+**Ubicación:** Valledupar, Colombia
